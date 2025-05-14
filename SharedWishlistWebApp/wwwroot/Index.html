@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist App</title>
+    <link rel="stylesheet" href="css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Wishlist App</h1>
+
+        <!-- Section: Create Wishlist -->
+        <div class="section">
+            <h3>Create Wishlist</h3>
+            <form action="javascript:void(0);" method="POST" onsubmit="createWishlist()">
+                <input type="text" id="wishlist-title" placeholder="Wishlist Title" required>
+                <input type="text" id="owner-name" placeholder="Your Name" required>
+                <input type="date" id="event-date" placeholder="Event Date">
+                <input type="submit" value="Create">
+            </form>
+            <p id="wishlist-created"></p>
+        </div>
+
+        <!-- Section: Add Gift Item -->
+        <div class="section" id="add-gift-section" style="display: none;">
+            <h3>Add Gift Item</h3>
+            <form action="javascript:void(0);" method="POST" onsubmit="addGiftItem()">
+                <input type="hidden" id="wishlist-id">
+                <input type="hidden" id="owner-id">
+                <input type="text" id="gift-title" placeholder="Gift Title" required>
+                <input type="text" id="gift-description" placeholder="Description">
+                <input type="url" id="gift-link" placeholder="Purchase Link">
+                <input type="number" id="gift-price" placeholder="Price" step="0.01" min="0">
+                <input type="submit" value="Add Gift">
+            </form>
+        </div>
+
+        <!-- Section: Join Wishlist -->
+        <div class="section">
+            <h3>Join Wishlist</h3>
+            <form action="javascript:void(0);" method="POST" onsubmit="joinWishlist()">
+                <input type="text" id="share-code" placeholder="Share Code" required>
+                <input type="text" id="guest-name" placeholder="Your Name" required>
+                <input type="text" id="guest-contact" placeholder="Contact Info (e.g., email)">
+                <input type="submit" value="Join">
+            </form>
+            <p id="join-status"></p>
+        </div>
+
+        <!-- Section: Wishlist Details (Guest View) -->
+        <div class="section" id="guest-wishlist-section" style="display: none;">
+            <h3>Wishlist Details</h3>
+            <p id="wishlist-details"></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Link</th>
+                        <th>Reservations</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="gift-items"></tbody>
+            </table>
+        </div>
+
+        <!-- Section: Reserve Gift -->
+        <div class="section" id="reserve-gift-section" style="display: none;">
+            <h3>Reserve a Gift</h3>
+            <form action="javascript:void(0);" method="POST" onsubmit="reserveGift()">
+                <input type="hidden" id="reserve-gift-id">
+                <input type="hidden" id="guest-id">
+                <input type="number" id="contribution-amount" placeholder="Contribution Amount" step="0.01" min="0" required>
+                <input type="number" id="split-count" placeholder="Split Count (e.g., 2)" min="1">
+                <input type="submit" value="Reserve">
+            </form>
+        </div>
+    </div>
+
+    <script src="js/wishlist.js"></script>
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if ownerId or guestId is stored (e.g., in localStorage)
+            if (localStorage.getItem('ownerId')) {
+                document.getElementById('add-gift-section').style.display = 'block';
+                document.getElementById('wishlist-id').value = localStorage.getItem('wishlistId');
+                document.getElementById('owner-id').value = localStorage.getItem('ownerId');
+            }
+            if (localStorage.getItem('guestId')) {
+                getWishlistForGuest(localStorage.getItem('shareCode'));
+            }
+        });
+    </script>
+</body>
+</html>

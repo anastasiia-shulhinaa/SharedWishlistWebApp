@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "sharedwishlistwebapp.client", "sharedwishlistwebapp.client\sharedwishlistwebapp.client.esproj", "{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedWishlistWebApp.Server", "SharedWishlistWebApp.Server\SharedWishlistWebApp.Server.csproj", "{A979241C-0946-4289-AECC-DE7242AF1718}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B82197B4-A2BE-CA84-F25F-4DDFDFCD3A46}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A979241C-0946-4289-AECC-DE7242AF1718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A979241C-0946-4289-AECC-DE7242AF1718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A979241C-0946-4289-AECC-DE7242AF1718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A979241C-0946-4289-AECC-DE7242AF1718}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {44471EE6-AB81-435C-BE92-5F302A756CCC}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@SharedWishlistWebApp.Server_HostAddress = http://localhost:5259
+
+GET {{SharedWishlistWebApp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

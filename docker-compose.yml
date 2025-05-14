@@ -1,0 +1,33 @@
+services:
+  sharedwishlistwebapp:
+    build:
+      context: .
+      dockerfile: SharedWishlistWebApp/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - sqlserverService
+    networks:
+      - wishlistnet
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+
+  sqlserverService:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserverService
+    hostname: sqlserverService
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./data/mssql:/var/opt/mssql
+    environment:
+      - SA_PASSWORD=YourStrong!Password
+      - ACCEPT_EULA=Y
+    networks:
+      - wishlistnet
+
+networks:
+  wishlistnet:
+    driver: bridge
