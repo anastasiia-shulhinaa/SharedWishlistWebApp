@@ -51,6 +51,20 @@ public class GiftItemController : ControllerBase
         }
     }
 
+    [HttpGet]
+    public async Task<ActionResult<List<GiftItemDto>>> GetGiftItems([FromQuery] int wishlistId, [FromQuery] string ownerId)
+    {
+        try
+        {
+            var giftItems = await _giftItemService.GetGiftItemsByWishlistAsync(wishlistId, ownerId);
+            return Ok(giftItems);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
+
     [HttpPut("{giftItemId}")]
     public async Task<ActionResult<GiftItemDto>> UpdateGiftItem(int giftItemId, [FromQuery] string ownerId, [FromBody] GiftItemUpdateDto dto)
     {

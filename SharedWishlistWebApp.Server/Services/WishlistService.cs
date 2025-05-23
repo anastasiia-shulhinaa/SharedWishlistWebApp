@@ -16,14 +16,13 @@ namespace SharedWishlistWebApp.Server.Services
             _mapper = mapper;
         }
 
-        public async Task<(WishlistDto Wishlist, string OwnerId)> CreateWishlistAsync(WishlistCreateDto dto)
+        public async Task<WishlistDto> CreateWishlistAsync(WishlistCreateDto dto)
         {
             var wishlist = _mapper.Map<Wishlist>(dto);
-            wishlist.OwnerId = Guid.NewGuid().ToString();
             wishlist.ShareCode = Guid.NewGuid().ToString("N").Substring(0, 8);
             _context.Wishlists.Add(wishlist);
             await _context.SaveChangesAsync();
-            return (_mapper.Map<WishlistDto>(wishlist), wishlist.OwnerId);
+            return (_mapper.Map<WishlistDto>(wishlist));
         }
 
         public async Task<WishlistDto> GetWishlistForOwnerAsync(int wishlistId, string ownerId)

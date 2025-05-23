@@ -34,12 +34,12 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     }
 }
 
-const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7209';
+
 
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [plugin()],
+
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -47,9 +47,11 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
+            // Proxy any request starting with /api to your backend
+            '/api': {
+                target: 'https://localhost:7209',
+                changeOrigin: true,
+                secure: false,  // if you use self-signed SSL certs
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '64917'),

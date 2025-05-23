@@ -9,5 +9,6 @@ namespace SharedWishlistWebApp.Server.DTOs
         [Required, MaxLength(50)]
         public string OwnerName { get; set; } = string.Empty;
         public DateTime? EventDate { get; set; }
+        public Guid? OwnerId { get; set; }
     }
 }

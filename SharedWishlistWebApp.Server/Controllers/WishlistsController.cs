@@ -21,15 +21,15 @@ public class WishlistController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<(WishlistDto Wishlist, string OwnerId)>> CreateWishlist([FromBody] WishlistCreateDto dto)
+    public async Task<ActionResult<WishlistDto>> CreateWishlist([FromBody] WishlistCreateDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            var (wishlist, ownerId) = await _wishlistService.CreateWishlistAsync(dto);
-            return CreatedAtAction(nameof(GetWishlistForOwner), new { wishlistId = wishlist.Id, ownerId }, (wishlist, ownerId));
+            var wishlist = await _wishlistService.CreateWishlistAsync(dto);
+            return CreatedAtAction(nameof(GetWishlistForOwner), new { wishlistId = wishlist.Id }, (wishlist));
         }
         catch (Exception ex)
         {

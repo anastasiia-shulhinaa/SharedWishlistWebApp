@@ -37,6 +37,25 @@ namespace SharedWishlistWebApp.Server.Services
             return _mapper.Map<GiftItemDto>(giftItem);
         }
 
+        public async Task<List<GiftItemDto>> GetGiftItemsByWishlistAsync(int wishlistId, string ownerId)
+        {
+            var wishlist = await _context.Wishlists
+                .Include(w => w.GiftItems)
+                .FirstOrDefaultAsync(w => w.Id == wishlistId && w.OwnerId == ownerId);
+
+            if (wishlist == null)
+                throw new Exception("Wishlist not found or does not belong to the specified owner.");
+
+            return wishlist.GiftItems.Select(g => new GiftItemDto
+            {
+                Id = g.Id,
+                Title = g.Title,
+                Description = g.Description,
+                Link = g.Link,
+                Price = g.Price
+            }).ToList();
+        }
+
         public async Task<GiftItemDto> UpdateGiftItemAsync(int giftItemId, string ownerId, GiftItemUpdateDto dto)
         {
             var giftItem = await _context.GiftItems
