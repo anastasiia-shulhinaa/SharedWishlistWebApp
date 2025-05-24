@@ -2,7 +2,7 @@ import type { GiftItemCreateDto, GiftItemDto } from '../types/types';
 
 const baseUrl = '/api/gift-items';
 
-export async function createGiftItem(wishlistId: number, ownerId: string, dto: GiftItemCreateDto): Promise<GiftItemDto> {
+export async function createGiftItem(wishlistId: string, ownerId: string, dto: GiftItemCreateDto): Promise<GiftItemDto> {
     const query = `?wishlistId=${wishlistId}&ownerId=${ownerId}`;
     const response = await fetch(baseUrl + query, {
         method: 'POST',
@@ -17,7 +17,7 @@ export async function createGiftItem(wishlistId: number, ownerId: string, dto: G
     return response.json();
 }
 
-export async function getGiftItems(wishlistId: number, ownerId: string): Promise<GiftItemDto[]> {
+export async function getGiftItems(wishlistId: string, ownerId: string): Promise<GiftItemDto[]> {
     const query = `?wishlistId=${wishlistId}&ownerId=${ownerId}`;
     const response = await fetch(baseUrl + query);
 

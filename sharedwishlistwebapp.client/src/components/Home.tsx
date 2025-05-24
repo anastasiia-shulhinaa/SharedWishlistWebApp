@@ -1,172 +1,164 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { createWishlist, getWishlist } from '../api/wishlistApi';
-import type { WishlistCreateDto, WishlistDto } from '../types/types';
-import { getOrCreateOwnerId } from '../utils/ownerutils'; 
-import { createGiftItem, getGiftItems } from '../api/giftItemApi';
-import type { GiftItemCreateDto, GiftItemDto } from '../types/types';
+import wishesBanner from '../img/wishes_banner.jpg';
+import WishlistList from './WishlistList';
+import Confetti from 'react-confetti';
+import WishlistCreateForm from './WishlistCreateForm';
+import GiftItemForm from './GiftItemForm';
+import GiftItemList from './GiftItemList';
 
 const Home = () => {
-    const [wishlistId, setWishlistId] = useState('');
-    const [title, setTitle] = useState('');
-    const [ownerName, setOwnerName] = useState('');
-    const [eventDate, setEventDate] = useState('');
-    const [wishlist, setWishlist] = useState<WishlistDto | null>(null);
-    const [error, setError] = useState('');
-    const ownerId = getOrCreateOwnerId();
-    const [giftItems, setGiftItems] = useState<GiftItemDto[]>([]);
-    const [giftTitle, setGiftTitle] = useState('');
-    const [giftDescription, setGiftDescription] = useState('');
-    const [giftLink, setGiftLink] = useState('');
-    const [giftPrice, setGiftPrice] = useState<number | undefined>(undefined);
-    const [giftError, setGiftError] = useState('');
+    const [showForms, setShowForms] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newWishlistId, setNewWishlistId] = useState<string | null>(null);
 
-
-    const handleCreate = async () => {
-        const dto: WishlistCreateDto = { title, ownerName, eventDate, ownerId };
-        try {
-            const createdWishlist = await createWishlist(dto); // assume API returns created wishlist or at least its ID
-            alert('Wishlist created successfully.');
-            setWishlistId(createdWishlist.id); // store the generated ID automatically
-            setWishlist(createdWishlist);      // optionally display it immediately
-        } catch (err: any) {
-            console.error('Create wishlist error:', err);
-            alert('Error creating wishlist: ' + err.message);
-        }
+    const handleGiftAdded = () => {
+        // No-op for now; GiftItemList handles its own updates
     };
 
-    const handleGet = async () => {
-        if (!wishlistId) {
-            setError('No wishlist ID available to fetch.');
-            return;
-        }
-        try {
-            setError('');
-            const data = await getWishlist(wishlistId, ownerId);
-            setWishlist(data);
-        } catch (err: any) {
-            console.error('Fetch wishlist error:', err);
-            setError(err.message || 'Failed to load wishlist');
-        }
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setNewWishlistId(null);
     };
 
-    useEffect(() => {
-        if (wishlistId !== null) {
-            loadGiftItems();
-        }
-    }, [wishlistId]);
-
-    const loadGiftItems = async () => {
-        try {
-            const items = await getGiftItems(wishlistId!, ownerId);
-            setGiftItems(items);
-            setGiftError('');
-        } catch (err: any) {
-            setGiftError(err.message || 'Failed to load gift items');
-        }
-    };
-
-    const handleAddGiftItem = async () => {
-        if (wishlistId === null) {
-            alert('Please create or load a wishlist first.');
-            return;
-        }
-
-        const dto: GiftItemCreateDto = {
-            title: giftTitle,
-            description: giftDescription || undefined,
-            link: giftLink || undefined,
-            price: giftPrice,
-        };
-
-        try {
-            await createGiftItem(wishlistId, ownerId, dto);
-            setGiftTitle('');
-            setGiftDescription('');
-            setGiftLink('');
-            setGiftPrice(undefined);
-            await loadGiftItems(); // refresh list
-        } catch (err: any) {
-            setGiftError(err.message || 'Failed to add gift item');
-        }
+    const handleWishlistCreated = (wishlistId: string) => {
+        setShowConfetti(true);
+        setNewWishlistId(wishlistId);
+        setTimeout(() => setShowConfetti(false), 3000);
     };
 
     return (
-        <div>
-            <h1>Create Your Wishlist</h1>
-            <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Wishlist title"
-            />
-            <br />
-            <input
-                value={ownerName}
-                onChange={(e) => setOwnerName(e.target.value)}
-                placeholder="Owner name"
-            />
-            <br />
-            <input
-                value={eventDate}
-                onChange={(e) => setEventDate(e.target.value)}
-                placeholder="Event date"
-            />
-            <br />
-            <button onClick={handleCreate}>Create</button>
-
-            <button onClick={handleGet}>Get Wishlist</button>
-
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-
-            {wishlist && (
-                <div>
-                    <h3>Wishlist Details</h3>
-                    <p><strong>Title:</strong> {wishlist.title}</p>
-                    <p><strong>Owner:</strong> {wishlist.ownerName}</p>
-                    <p><strong>Event Date:</strong> {wishlist.eventDate}</p>
-                </div>
+        <div className="min-h-screen bg-gradient-to-r from-[var(--primary-pink)] to-[var(--primary-teal)] font-['Poppins'] text-gray-800">
+            {showConfetti && (
+                <Confetti
+                    width={window.innerWidth}
+                    height={window.innerHeight}
+                    colors={['#f472b6', '#2dd4bf', '#facc15']}
+                />
             )}
-            <h2>Gift Items</h2>
+            <nav className="navbar navbar-expand-lg navbar-dark bg-[var(--primary-pink)] shadow-lg">
+                <div className="container-fluid">
+                    <a className="navbar-brand fw-bold" href="#">
+                        <i className="fas fa-birthday-cake mr-2"></i>Wishes
+                    </a>
+                    <button
+                        className="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav"
+                    >
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+                    <div className="collapse navbar-collapse" id="navbarNav">
+                        <ul className="navbar-nav ms-auto">
+                            <li className="nav-item">
+                                <a className="nav-link" href="#">Режим іменинника</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="#">Режим гостя</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="#">
+                                    <i className="fas fa-robot mr-2"></i>Помічник AI
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
 
-            {giftError && <p style={{ color: 'red' }}>{giftError}</p>}
+            <div className="container mt-5">
+                <div className="relative mb-6 flex justify-center overflow-auto">
+                    <div className="banner-wrapper flex flex-col items-center justify-center gap-6 py-8">
+                        <img
+                            src={wishesBanner}
+                            alt="Святковий банер"
+                            className="rounded-lg shadow-lg"
+                            style={{ width: '300px', height: '300px' }}
+                            onError={() => console.error("Failed to load banner image")}
+                        />
+                        <p className="text-xl md:text-2xl text-white font-semibold bg-gradient-to-r from-[#2dd4bf] to-[#facc15] bg-clip-text animate-pulse-slow">
+                            Створюйте та діліться списком бажань на день народження з друзями та родиною!
+                        </p>
+                    </div>
+                </div>
 
-            <input
-                placeholder="Gift Title"
-                value={giftTitle}
-                onChange={(e) => setGiftTitle(e.target.value)}
-            />
-            <br />
-            <input
-                placeholder="Description"
-                value={giftDescription}
-                onChange={(e) => setGiftDescription(e.target.value)}
-            />
-            <br />
-            <input
-                placeholder="Link"
-                value={giftLink}
-                onChange={(e) => setGiftLink(e.target.value)}
-            />
-            <br />
-            <input
-                type="number"
-                placeholder="Price"
-                value={giftPrice ?? ''}
-                onChange={(e) => setGiftPrice(e.target.value ? Number(e.target.value) : undefined)}
-            />
-            <br />
-            <button onClick={handleAddGiftItem}>Add Gift Item</button>
+                <div className="md:w-1/4 text-center md:text-left mb-6">
+                    <button
+                        className="btn btn-primary rounded-full px-8 py-3 text-lg font-bold bg-gradient-to-r from-[#f472b6] to-[#2dd4bf] hover:from-[#facc15] hover:to-[#f472b6] shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 text-white"
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        <i className="fas fa-plus mr-2"></i>Створити новий список бажань
+                    </button>
+                </div>
 
-            <ul>
-                {giftItems.map(item => (
-                    <li key={item.id}>
-                        <strong>{item.title}</strong> - {item.description} - {item.price && `$${item.price.toFixed(2)}`} <br />
-                        {item.link && <a href={item.link} target="_blank" rel="noreferrer">Link</a>}
-                    </li>
-                ))}
-            </ul>
+
+                {/* Modal */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto">
+                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 w-full max-w-3xl my-8 border-4 border-gradient-to-r from-[#f472b6] to-[#2dd4bf] shadow-2xl animate-fade-in">
+                            <div className="flex justify-between items-center mb-6 sticky top-0 bg-white/10 backdrop-blur-md p-4 rounded-t-lg z-10">
+                                <h2 className="text-2xl font-bold text-white">
+                                    {newWishlistId ? 'Додайте подарунки до списку' : 'Створіть новий список бажань'}
+                                </h2>
+                                <button
+                                    onClick={closeModal}
+                                    className="text-gray-200 hover:text-red-500 transition-colors duration-200 text-xl"
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            {/* Wishlist Creation Form */}
+                            {!newWishlistId && (
+                                <div className="mb-8">
+                                    <WishlistCreateForm
+                                        onWishlistCreated={() => {
+                                            const newWishlist = JSON.parse(localStorage.getItem('lastCreatedWishlist') || '{}');
+                                            if (newWishlist && newWishlist.id) {
+                                                handleWishlistCreated(newWishlist.id.toString());
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Gift Item Form and List */}
+                            {newWishlistId && (
+                                <div className="space-y-8">
+                                    <GiftItemForm wishlistId={newWishlistId} onGiftAdded={handleGiftAdded} />
+                                    <GiftItemList wishlistId={newWishlistId} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Existing Content (Overlapped by Modal) */}
+                <div className="mt-8">
+                    <h2 className="text-2xl md:text-3xl text-white font-bold mb-6 text-center">
+                        Існуючі картки бажань
+                    </h2>
+                    <WishlistList />
+                </div>
+            </div>
         </div>
     );
-
 };
 
+// Add animation keyframes
+const styles = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+`;
+const styleSheet = document.createElement('style');
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
+
 export default Home;
+

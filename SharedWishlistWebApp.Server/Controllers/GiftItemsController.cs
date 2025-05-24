@@ -65,6 +65,20 @@ public class GiftItemController : ControllerBase
         }
     }
 
+    [HttpGet("share/{shareCode}")]
+    public async Task<ActionResult<List<GiftItemGuestViewDto>>> GetGiftItemsByShareCode(string shareCode)
+    {
+        try
+        {
+            var giftItems = await _giftItemService.GetGiftItemsByShareCodeAsync(shareCode);
+            return Ok(giftItems);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
     [HttpPut("{giftItemId}")]
     public async Task<ActionResult<GiftItemDto>> UpdateGiftItem(int giftItemId, [FromQuery] string ownerId, [FromBody] GiftItemUpdateDto dto)
     {

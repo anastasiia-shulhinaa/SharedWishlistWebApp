@@ -56,6 +56,42 @@ namespace SharedWishlistWebApp.Server.Services
             }).ToList();
         }
 
+        public async Task<List<GiftItemGuestViewDto>> GetGiftItemsByShareCodeAsync(string shareCode)
+        {
+            var wishlist = await _context.Wishlists
+                .FirstOrDefaultAsync(w => w.ShareCode == shareCode);
+            if (wishlist == null)
+                throw new Exception("Wishlist not found");
+
+            return await _context.GiftItems
+                .Where(g => g.WishlistId == wishlist.Id)
+                .Select(g => new GiftItemGuestViewDto
+                {
+                    Id = g.Id,
+                    Title = g.Title,
+                    Description = g.Description,
+                    Price = g.Price,
+                    Link = g.Link,
+                    IsFullyReserved = g.GiftReservations
+                        .Where(r => r.Status == "Confirmed")
+                        .Sum(r => r.ContributionAmount ?? 0) >= (g.Price ?? 0),
+                    ReservedAmount = g.GiftReservations
+                        .Where(r => r.Status == "Confirmed")
+                        .Sum(r => r.ContributionAmount ?? 0),
+                    Reservations = g.GiftReservations
+                        .Select(r => new GiftReservationDto
+                        {
+                            Id = r.Id,
+                            GiftItemId = r.GiftItemId,
+                            GuestId = r.GuestId,
+                            ContributionAmount = r.ContributionAmount,
+                            Status = r.Status,
+                            ReservedAt = r.ReservedAt
+                        })
+                        .ToList()
+                })
+                .ToListAsync();
+        }
         public async Task<GiftItemDto> UpdateGiftItemAsync(int giftItemId, string ownerId, GiftItemUpdateDto dto)
         {
             var giftItem = await _context.GiftItems

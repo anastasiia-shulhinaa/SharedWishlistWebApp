@@ -25,18 +25,20 @@ namespace SharedWishlistWebApp.Server
             builder.Services.AddOpenApi();
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowReactApp", policy =>
+                options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.WithOrigins("https://localhost:64917") // or whatever your React port is
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policy.WithOrigins("https://localhost:64917")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
                 });
             });
+
+            
 
 
             var app = builder.Build();
 
-            app.UseCors("AllowReactApp");
+            app.UseCors("AllowAll");
             app.UseDefaultFiles();
             app.MapStaticAssets();
 

@@ -134,6 +134,107 @@ body {
         .table tr:hover {
             background: var(--soft-white);
         }
+/* Custom animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseSlow {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out;
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 2s infinite;
+}
+
+/* Text shadow for better readability */
+.text-shadow-lg {
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+.banner-wrapper {
+    padding: 0 0.5rem;
+}
+
+
+
+/* Override card background for wishlist cards to maintain frosted glass effect */
+.grid .card {
+    background: rgba(255, 255, 255, 0.1) !important; /* Matches bg-white/10 */
+    backdrop-filter: blur(8px) !important; /* Matches backdrop-blur-md */
+    border: 4px solid transparent !important; /* Match existing border width */
+    border-image-slice: 1 !important;
+}
+
+    .grid .card:nth-child(3n+1) {
+        border-image: linear-gradient(to right, #f472b6, #2dd4bf) 1 !important; /* Pink to teal */
+    }
+
+    .grid .card:nth-child(3n+2) {
+        border-image: linear-gradient(to right, #2dd4bf, #facc15) 1 !important; /* Teal to yellow */
+    }
+
+    .grid .card:nth-child(3n) {
+        border-image: linear-gradient(to right, #facc15, #f472b6) 1 !important; /* Yellow to pink */
+    }
+
+    /* More vibrant wishlist title color */
+    .grid .card h3 {
+        color: #ff2a82 !important; /* Hot pink, more vibrant than #ff69b4 */
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Subtle shadow for emphasis */
+    }
+
+    .grid .card p {
+        color: #e5e7eb !important; /* Matches text-gray-200 for owner and date */
+    }
+
+    .grid .card h4 {
+        color: white !important; /* Matches text-white for "Подарунки" header */
+    }
+
+    .grid .card ul {
+        color: #e5e7eb !important; /* Matches text-gray-200 for gift items */
+    }
+
+    .grid .card .text-gray-300 {
+        color: #d1d5db !important; /* Matches text-gray-300 for "Немає подарунків" */
+    }
+
+    /* Ensure button styles are applied correctly */
+    .grid .card .btn-primary {
+        background: var(--primary-teal) !important; /* Ensure teal background */
+        color: white !important; /* Readable text */
+    }
+
+    .grid .card .btn-secondary {
+        background-color: #ff1493 !important; /* Vibrant magenta */
+        color: white !important;
+        transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+
+        .grid .card .btn-secondary:hover {
+            background-color: #e01283 !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 16px rgba(224, 18, 131, 0.4) !important;
+        }
 
 #root {
     min-height: 100vh;

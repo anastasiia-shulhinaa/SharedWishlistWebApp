@@ -62,5 +62,24 @@ namespace SharedWishlistWebApp.Server.Services
             _context.Wishlists.Remove(wishlist);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<WishlistDto>> GetWishlistsByOwnerIdAsync(string ownerId)
+        {
+            if (string.IsNullOrEmpty(ownerId))
+                throw new ArgumentException("OwnerId cannot be null or empty");
+
+            var wishlists = await _context.Wishlists
+                .Where(w => w.OwnerId == ownerId)
+                .Include(w => w.GiftItems)
+                .ToListAsync();
+
+            if (wishlists == null || !wishlists.Any())
+                return new List<WishlistDto>();
+
+            return _mapper.Map<List<WishlistDto>>(wishlists);
+        }
+
+
+
     }
 }

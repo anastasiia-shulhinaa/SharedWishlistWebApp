@@ -47,12 +47,11 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            // Proxy any request starting with /api to your backend
             '/api': {
                 target: 'https://localhost:7209',
                 changeOrigin: true,
-                secure: false,  // if you use self-signed SSL certs
-            }
+                secure: false, // Allow self-signed certificates
+            },
         },
         port: parseInt(env.DEV_SERVER_PORT || '64917'),
         https: {

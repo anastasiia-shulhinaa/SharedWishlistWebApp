@@ -107,4 +107,25 @@ public class WishlistController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet("owner/{ownerId}")]
+    public async Task<ActionResult<List<WishlistDto>>> GetWishlistsByOwnerId(string ownerId)
+    {
+        if (string.IsNullOrEmpty(ownerId))
+            return BadRequest("OwnerId is required");
+
+        try
+        {
+            var wishlists = await _wishlistService.GetWishlistsByOwnerIdAsync(ownerId);
+            return Ok(wishlists);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
+    }
 }
