@@ -22,7 +22,7 @@ const WishlistView = () => {
 
     return (
         <div>
-            <h2>Viewing: {wishlist.name}</h2>
+            <h2>Viewing: {wishlist.title}</h2>
             <ul>
                 {wishlist.giftItems.map(item => (
                     <li key={item.id}>

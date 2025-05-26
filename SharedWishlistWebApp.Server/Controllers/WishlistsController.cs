@@ -14,10 +14,13 @@ using SharedWishlistWebApp.Server.Services;
 public class WishlistController : ControllerBase
 {
     private readonly WishlistService _wishlistService;
-
-    public WishlistController(WishlistService wishlistService)
+    private readonly GuestService _guestService;
+    private readonly WishlistGuestService _wishlistGuestService;
+    public WishlistController(WishlistService wishlistService, GuestService guestService, WishlistGuestService wishlistGuestService)
     {
         _wishlistService = wishlistService;
+        _guestService = guestService;
+        _wishlistGuestService = wishlistGuestService;
     }
 
     [HttpPost]
@@ -60,9 +63,34 @@ public class WishlistController : ControllerBase
         if (string.IsNullOrEmpty(shareCode))
             return BadRequest("ShareCode is required");
 
+        var ownerId = Request.Headers["Owner-Id"].FirstOrDefault();
+        var guestId = Request.Headers["Guest-Id"].FirstOrDefault();
+
+        if (string.IsNullOrEmpty(ownerId) && string.IsNullOrEmpty(guestId))
+            return BadRequest(new { message = "Either Owner-Id or Guest-Id must be provided in the headers." });
+
+        if (!string.IsNullOrEmpty(ownerId))
+        {
+            var isOwner = await _wishlistService.IsOwnerAsync(shareCode, ownerId);
+            if (isOwner)
+            {
+                return Unauthorized(new { message = "Sorry, your wishlists can view only guests. If you want statistics or to change something, find the necessary wishlist in your profile and press переглянути." });
+            }
+        }
+
         try
         {
             var wishlist = await _wishlistService.GetWishlistByShareCodeAsync(shareCode);
+
+            if (!string.IsNullOrEmpty(guestId) && int.TryParse(guestId, out var parsedGuestId))
+            {
+                var guestExists = await _guestService.IsGuestAsync(guestId);
+                if (guestExists)
+                {
+                    await _wishlistGuestService.CreateWishlistGuestAsync(wishlist.Id, parsedGuestId);
+                }
+            }
+
             return Ok(wishlist);
         }
         catch (Exception ex)

@@ -2,6 +2,7 @@
 import { createGiftItem } from '../api/giftItemApi';
 import type { GiftItemCreateDto } from '../types/types';
 import { getOrCreateOwnerId } from '../utils/ownerutils';
+import '../styles/gifts-form.css';
 
 const GiftItemForm: React.FC<{ wishlistId: string; onGiftAdded: () => void }> = ({
     wishlistId,
@@ -15,10 +16,22 @@ const GiftItemForm: React.FC<{ wishlistId: string; onGiftAdded: () => void }> = 
     const ownerId = getOrCreateOwnerId();
 
     const handleAddGiftItem = async () => {
+        // Validation checks
         if (!wishlistId) {
             setGiftError('Спочатку створіть або завантажте список');
             return;
         }
+
+        if (!giftTitle) {
+            setGiftError('Назва подарунка є обов’язковою');
+            return;
+        }
+
+        if (giftPrice !== undefined && giftPrice < 0) {
+            setGiftError('Ціна не може бути від’ємною');
+            return;
+        }
+
         const dto: GiftItemCreateDto = {
             title: giftTitle,
             description: giftDescription || undefined,
@@ -39,67 +52,70 @@ const GiftItemForm: React.FC<{ wishlistId: string; onGiftAdded: () => void }> = 
     };
 
     return (
-        <div className="card p-4 mb-4 fade-in border-2 border-[var(--primary-teal)]">
-            <div className="card-header bg-[var(--primary-pink)] text-white rounded-t-lg">
-                <h2 className="text-xl font-bold mb-0">
-                    <i className="fas fa-gift mr-2"></i>Додати подарунок
+        <div className="gift-item-form">
+            <div className="gift-item-form__header">
+                <h2>
+                    <i className="fas fa-gift"></i> Додати подарунок
                 </h2>
             </div>
-            <div className="card-body">
+            <div className="gift-item-form__body">
                 {giftError && (
-                    <div className="alert alert-danger" role="alert">
+                    <div className="gift-item-form__error" role="alert">
                         {giftError}
                     </div>
                 )}
                 <form>
-                    <div className="mb-3">
-                        <label className="form-label fw-semibold text-white">Назва подарунка</label>
+                    <div className="gift-item-form__field">
+                        <label className="gift-item-form__label">
+                            Назва подарунка <span>*</span>
+                        </label>
                         <input
                             type="text"
-                            className="form-control rounded-lg border-gray-300 focus:border-[var(--primary-teal)] focus:ring focus:ring-[var(--primary-teal)] focus:ring-opacity-50"
+                            className="gift-item-form__input"
                             value={giftTitle}
                             onChange={(e) => setGiftTitle(e.target.value)}
                             placeholder="Назва подарунка"
                             required
                         />
                     </div>
-                    <div className="mb-3">
-                        <label className="form-label fw-semibold text-white">Опис</label>
+                    <div className="gift-item-form__field">
+                        <label className="gift-item-form__label">Опис</label>
                         <textarea
-                            className="form-control rounded-lg border-gray-300 focus:border-[var(--primary-teal)] focus:ring focus:ring-[var(--primary-teal)] focus:ring-opacity-50"
+                            className="gift-item-form__input"
                             rows={4}
                             value={giftDescription}
                             onChange={(e) => setGiftDescription(e.target.value)}
-                            placeholder="Опис подарунка"
+                            placeholder="Опис подарунка (необов’язково)"
                         />
                     </div>
-                    <div className="mb-3">
-                        <label className="form-label fw-semibold text-white">Посилання на покупку</label>
+                    <div className="gift-item-form__field">
+                        <label className="gift-item-form__label">Посилання на покупку</label>
                         <input
                             type="url"
-                            className="form-control rounded-lg border-gray-300 focus:border-[var(--primary-teal)] focus:ring focus:ring-[var(--primary-teal)] focus:ring-opacity-50"
+                            className="gift-item-form__input"
                             value={giftLink}
                             onChange={(e) => setGiftLink(e.target.value)}
-                            placeholder="Посилання на покупку"
+                            placeholder="Посилання на покупку (необов’язково)"
                         />
                     </div>
-                    <div className="mb-3">
-                        <label className="form-label fw-semibold text-white">Ціна (₴)</label>
+                    <div className="gift-item-form__field">
+                        <label className="gift-item-form__label">Ціна (гривні, ₴)</label>
                         <input
                             type="number"
-                            className="form-control rounded-lg border-gray-300 focus:border-[var(--primary-teal)] focus:ring focus:ring-[var(--primary-teal)] focus:ring-opacity-50"
+                            className="gift-item-form__input"
                             value={giftPrice ?? ''}
                             onChange={(e) => setGiftPrice(e.target.value ? Number(e.target.value) : undefined)}
-                            placeholder="Ціна подарунка"
+                            placeholder="Ціна подарунка (необов’язково)"
                             step="0.01"
+                            min="0"
                         />
                     </div>
                     <button
                         type="button"
-                        className="btn btn-primary rounded-full px-4 py-2 hover:bg-[#26a69a] hover:scale-105 transition-transform"
+                        className="gift-item-form__button"
                         onClick={handleAddGiftItem}
                     >
-                        <i className="fas fa-plus mr-2"></i>Додати подарунок
+                        <i className="fas fa-plus"></i> Додати подарунок
                     </button>
                 </form>
             </div>

@@ -19,6 +19,7 @@ namespace SharedWishlistWebApp.Server
             builder.Services.AddScoped<GiftItemService>();
             builder.Services.AddScoped<GiftReservationService>();
             builder.Services.AddScoped<GuestService>();
+            builder.Services.AddScoped<WishlistGuestService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

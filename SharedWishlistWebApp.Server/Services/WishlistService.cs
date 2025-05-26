@@ -41,6 +41,7 @@ namespace SharedWishlistWebApp.Server.Services
                 .ThenInclude(g => g.GiftReservations)
                 .FirstOrDefaultAsync(w => w.ShareCode == shareCode)
                 ?? throw new Exception("Wishlist not found");
+
             return _mapper.Map<WishlistGuestViewDto>(wishlist);
         }
 
@@ -79,6 +80,12 @@ namespace SharedWishlistWebApp.Server.Services
             return _mapper.Map<List<WishlistDto>>(wishlists);
         }
 
+        public async Task<bool> IsOwnerAsync(string shareCode, string ownerId)
+        {
+            var wishlist = await _context.Wishlists
+                .FirstOrDefaultAsync(w => w.ShareCode == shareCode);
+            return wishlist != null && wishlist.OwnerId == ownerId;
+        }
 
 
     }

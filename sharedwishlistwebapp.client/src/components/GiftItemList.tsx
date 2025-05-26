@@ -2,8 +2,9 @@
 import { getGiftItems } from '../api/giftItemApi';
 import type { GiftItemDto } from '../types/types';
 import { getOrCreateOwnerId } from '../utils/ownerutils';
+import '../styles/gift-items.css';
 
-const GiftItemList: React.FC<{ wishlistId: string }> = ({ wishlistId }) => {
+const GiftItemList: React.FC<{ wishlistId: string; refresh?: number }> = ({ wishlistId, refresh = 0 }) => {
     const [giftItems, setGiftItems] = useState<GiftItemDto[]>([]);
     const [giftError, setGiftError] = useState('');
     const ownerId = getOrCreateOwnerId();
@@ -22,61 +23,60 @@ const GiftItemList: React.FC<{ wishlistId: string }> = ({ wishlistId }) => {
         if (wishlistId) {
             loadGiftItems();
         }
-    }, [wishlistId]);
+    }, [wishlistId, refresh]);
 
     return (
-        <div className="card p-4 fade-in border-2 border-[var(--primary-lemon)]">
-            <div className="card-header bg-[var(--primary-pink)] text-white rounded-t-lg">
-                <h2 className="text-xl font-bold mb-0">
-                    <i className="fas fa-gift mr-2"></i>Подарунки
+        <div className="gift-item-list">
+            <div className="gift-item-list__header">
+                <h2>
+                    <i className="fas fa-gift"></i> Подарунки
                 </h2>
             </div>
-            <div className="card-body">
+            <div className="gift-item-list__body">
                 {giftError && (
-                    <div className="alert alert-danger" role="alert">
+                    <div className="gift-item-list__error" role="alert">
                         {giftError}
                     </div>
                 )}
-                <div className="overflow-x-auto">
-                    <table className="table table-hover rounded-lg shadow-sm bg-white w-full">
+                <div className="gift-item-list__table-container">
+                    <table className="gift-item-list__table">
                         <thead>
                             <tr>
-                                <th scope="col" className="text-center">Зображення</th>
-                                <th scope="col" className="text-center">Подарунок</th>
-                                <th scope="col" className="text-center">Опис</th>
-                                <th scope="col" className="text-center">Ціна</th>
-                                <th scope="col" className="text-center">Посилання</th>
-                                <th scope="col" className="text-center">Дії</th>
+                                <th scope="col">Зображення</th>
+                                <th scope="col">Подарунок</th>
+                                <th scope="col">Опис</th>
+                                <th scope="col">Ціна</th>
+                                <th scope="col">Посилання</th>
+                                <th scope="col">Дії</th>
                             </tr>
                         </thead>
                         <tbody>
                             {giftItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center text-gray-500 py-4">
+                                    <td colSpan={6} className="gift-item-list__empty">
                                         Немає подарунків
                                     </td>
                                 </tr>
                             ) : (
                                 giftItems.map((item) => (
-                                    <tr key={item.id} className="hover:bg-[var(--soft-white)]">
-                                        <td className="text-center">
+                                    <tr key={item.id} className="gift-item-list__row">
+                                        <td>
                                             <img
                                                 src={`https://source.unsplash.com/60x60/?${item.title}`}
                                                 alt={item.title}
-                                                className="gift-image rounded mx-auto"
-                                                style={{ width: '60px', height: '60px' }}
+                                                className="gift-item-list__image"
                                             />
                                         </td>
-                                        <td className="text-center align-middle">{item.title}</td>
-                                        <td className="text-center align-middle">{item.description || '-'}</td>
-                                        <td className="text-center align-middle">{item.price ? `₴${item.price.toFixed(2)}` : '-'}</td>
-                                        <td className="text-center align-middle">
+                                        <td>{item.title}</td>
+                                        <td>{item.description || '-'}</td>
+                                        <td>{item.price ? `₴${item.price.toFixed(2)}` : '-'}</td>
+                                        <td>
                                             {item.link ? (
                                                 <a
                                                     href={item.link}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="text-[var(--primary-teal)] hover:underline"
+                                                    className="gift-item-list__link"
                                                 >
                                                     Купити
                                                 </a>
@@ -84,16 +84,16 @@ const GiftItemList: React.FC<{ wishlistId: string }> = ({ wishlistId }) => {
                                                 '-'
                                             )}
                                         </td>
-                                        <td className="text-center align-middle">
+                                        <td>
                                             <button
-                                                className="btn btn-primary btn-sm rounded-full mr-2"
+                                                className="gift-item-list__button gift-item-list__button--edit"
                                                 disabled
                                                 title="Редагувати (скоро буде)"
                                             >
                                                 <i className="fas fa-edit"></i>
                                             </button>
                                             <button
-                                                className="btn btn-lemon btn-sm rounded-full"
+                                                className="gift-item-list__button gift-item-list__button--delete"
                                                 disabled
                                                 title="Видалити (скоро буде)"
                                             >

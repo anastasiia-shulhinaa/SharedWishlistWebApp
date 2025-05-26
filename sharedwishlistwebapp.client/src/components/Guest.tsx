@@ -1,38 +1,120 @@
-﻿// src/components/Guest.tsx
+﻿// Guest.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import type { WishlistGuestViewDto, GiftItemGuestViewDto, GiftReservationCreateDto } from '../types/types';
+import type { WishlistGuestViewDto, GiftItemGuestViewDto, GiftReservationCreateDto, GuestCreateDto, GuestDto } from '../types/types';
 import GiftItemListGuest from './GiftItemListGuest';
 import ReserveGiftFormGuest from './ReserveGiftFormGuest';
-import { getWishlistByShareCode } from '../api/guestApi';
+import GuestForm from './GuestForm';
+import { getOrCreateGuestId, setGuestId } from '../utils/guestUtils';
+import { getWishlistByShareCode, reserveGift, cancelReservation } from '../api/guestApi';
+import '../styles/guest.css';
+
+const backendUrl = 'https://localhost:7209/api';
 
 const Guest: React.FC = () => {
     const { shareCode } = useParams<{ shareCode: string }>();
     const [wishlist, setWishlist] = useState<WishlistGuestViewDto | null>(null);
     const [error, setError] = useState('');
     const [selectedGift, setSelectedGift] = useState<GiftItemGuestViewDto | null>(null);
+    const [showGuestForm, setShowGuestForm] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const guestId = getOrCreateGuestId();
 
     useEffect(() => {
-        const loadWishlist = async () => {
+        let isMounted = true;
+        const loadData = async () => {
+            console.log('Loading data, guestId:', guestId, 'shareCode:', shareCode);
+            if (!shareCode) {
+                console.log('No shareCode, setting error');
+                if (isMounted) {
+                    setError('Share code is missing');
+                    setShowGuestForm(true);
+                    setIsLoading(false);
+                }
+                return;
+            }
+
             try {
-                if (!shareCode) throw new Error('No share code provided');
-                const data = await getWishlistByShareCode(shareCode);
-                setWishlist(data);
-                setError('');
+                if (guestId && !isNaN(parseInt(guestId))) {
+                    console.log('Checking guest existence for guestId:', guestId);
+                    const response = await fetch(`${backendUrl}/guests/${guestId}`, { method: 'HEAD' });
+                    console.log('HEAD request response status:', response.status);
+                    if (response.ok) {
+                        console.log('Guest exists, fetching wishlist...');
+                        const wishlistData = await getWishlistByShareCode(shareCode);
+                        if (isMounted) {
+                            setWishlist(wishlistData);
+                            setIsLoading(false);
+                        }
+                        return;
+                    } else {
+                        console.log('Guest does not exist or invalid response:', response.statusText);
+                    }
+                } else {
+                    console.log('No valid guestId, showing guest form');
+                }
+                if (isMounted) {
+                    setShowGuestForm(true);
+                    setIsLoading(false);
+                }
             } catch (err: any) {
-                setError('Не вдалося завантажити список бажань: ' + err.message);
+                console.error('Error during loadData:', err.message);
+                if (isMounted) {
+                    setError('Не вдалося завантажити список: ' + err.message);
+                    setShowGuestForm(true);
+                    setIsLoading(false);
+                }
             }
         };
-        loadWishlist();
+
+        loadData();
+        return () => { isMounted = false; };
     }, [shareCode]);
 
-    const handleReserve = async (giftId: string, dto: GiftReservationCreateDto) => {
+    const handleGuestSubmit = async (guest: GuestCreateDto, _guestId: string) => {
         try {
-            await import('../api/guestApi').then(({ reserveGift }) => reserveGift(giftId, dto));
+            console.log('Submitting guest:', guest);
+            setIsLoading(true);
+            const response = await fetch(`${backendUrl}/guests`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(guest),
+            });
+            if (!response.ok) throw new Error(await response.text() || 'Failed to register guest');
+
+            const createdGuest: GuestDto = await response.json();
+            console.log('Guest created, new ID:', createdGuest.id);
+            setGuestId(createdGuest.id);
+
+            const wishlistData = await getWishlistByShareCode(shareCode!);
+            setWishlist(wishlistData);
+            setShowGuestForm(false);
+            setIsLoading(false);
+        } catch (err: any) {
+            console.error('Error during guest submission:', err.message);
+            setError('Не вдалося зареєструвати гостя: ' + err.message);
+            setIsLoading(false);
+        }
+    };
+
+    const handleReservationSuccess = async (updatedGiftItem: GiftItemGuestViewDto) => {
+        try {
+            setIsLoading(true);
+            // Update the wishlist with the new gift item state
+            if (wishlist) {
+                const updatedGiftItems = wishlist.giftItems.map(gift =>
+                    gift.id === updatedGiftItem.id ? updatedGiftItem : gift
+                );
+                setWishlist({ ...wishlist, giftItems: updatedGiftItems });
+            }
             setSelectedGift(null);
             setError('');
+            setIsLoading(false);
         } catch (err: any) {
-            setError('Не вдалося зарезервувати подарунок: ' + err.message);
+            setError('Не вдалося оновити список після резервування: ' + err.message);
+            setIsLoading(false);
         }
     };
 
@@ -40,37 +122,58 @@ const Guest: React.FC = () => {
         setSelectedGift(null);
     };
 
-    if (!wishlist) return <div className="text-center text-white mt-10">Завантаження...</div>;
-
-    return (
-        <div className="min-h-screen bg-gradient-to-r from-[var(--primary-pink)] to-[var(--primary-teal)] font-['Poppins'] text-gray-800 p-6">
-            <div className="max-w-4xl mx-auto">
-                <h1 className="text-3xl font-bold text-white mb-6 text-center bg-gradient-to-r from-[#2dd4bf] to-[#facc15] bg-clip-text">
-                    Список бажань: {wishlist.title}
-                </h1>
-
-                {error && (
-                    <div className="alert alert-danger text-center mb-6" role="alert">
+    if (error.includes('Sorry, your wishlists can view only guests')) {
+        return (
+            <div className="guest-error-modal">
+                <div className="guest-error-modal__content">
+                    <div className="guest-error-modal__header">
+                        <h2>Помилка</h2>
+                    </div>
+                    <div className="guest-error-modal__body">
                         {error}
                     </div>
-                )}
+                </div>
+            </div>
+        );
+    }
 
-                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-6 shadow-lg border-2 border-[var(--primary-teal)]">
-                    <h2 className="text-xl font-semibold text-white mb-4">Деталі списку</h2>
+    if (isLoading) return <div className="guest-loading">Завантаження...</div>;
+
+    if (showGuestForm) {
+        return (
+            <div className="guest-container">
+                <div className="guest-content">
+                    {error && <div className="guest-error">{error}</div>}
+                    <GuestForm
+                        onSubmit={handleGuestSubmit}
+                        onCancel={() => setShowGuestForm(false)}
+                        error={error}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    if (!wishlist) return <div className="guest-not-found">Список не знайдено</div>;
+
+    return (
+        <div className="guest-container">
+            <div className="guest-content">
+                <h1 className="guest-title">Список бажань: {wishlist.title}</h1>
+                {error && <div className="guest-error">{error}</div>}
+                <div className="guest-wishlist-details">
+                    <h2 className="guest-wishlist-details__header">Деталі списку</h2>
                     <p><strong>Власник:</strong> {wishlist.ownerName}</p>
                     <p><strong>Дата події:</strong> {wishlist.eventDate
                         ? new Date(wishlist.eventDate).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
                         : 'Не вказано'}</p>
                 </div>
-
-                <GiftItemListGuest shareCode={shareCode!} onReserve={(gift) => setSelectedGift(gift)} />
-
+                <GiftItemListGuest giftItems={wishlist.giftItems} onReserve={(gift) => setSelectedGift(gift)} />
                 {selectedGift && (
                     <ReserveGiftFormGuest
-                        gift={selectedGift}
-                        onReserve={handleReserve}
+                        giftItem={selectedGift}
+                        onReservationSuccess={handleReservationSuccess}
                         onCancel={handleCancel}
-                        error={error}
                     />
                 )}
             </div>
@@ -78,4 +181,4 @@ const Guest: React.FC = () => {
     );
 };
 
-export default Guest;
+export default Guest; 

@@ -5,103 +5,48 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedWishlistWebApp.Server.DTOs;
 using SharedWishlistWebApp.Server.Models;
+using SharedWishlistWebApp.Server.Services;
 
 namespace SharedWishlistWebApp.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class GuestsController : ControllerBase
+    [Route("api/guests")]
+    public class GuestController : ControllerBase
     {
-        private readonly WishlistApiContext _context;
+        private readonly GuestService _guestService;
 
-        public GuestsController(WishlistApiContext context)
+        public GuestController(GuestService guestService)
         {
-            _context = context;
+            _guestService = guestService;
         }
 
-        // GET: api/Guests
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Guest>>> GetGuests()
+        [HttpPost]
+        public async Task<ActionResult<GuestDto>> CreateGuest([FromBody] GuestCreateDto dto)
         {
-            return await _context.Guests.ToListAsync();
-        }
-
-        // GET: api/Guests/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Guest>> GetGuest(int id)
-        {
-            var guest = await _context.Guests.FindAsync(id);
-
-            if (guest == null)
-            {
-                return NotFound();
-            }
-
-            return guest;
-        }
-
-        // PUT: api/Guests/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGuest(int id, Guest guest)
-        {
-            if (id != guest.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(guest).State = EntityState.Modified;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
-                await _context.SaveChangesAsync();
+                var guest = await _guestService.CreateGuestAsync(dto);
+                return Ok(guest);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!GuestExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
-
-            return NoContent();
         }
 
-        // POST: api/Guests
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Guest>> PostGuest(Guest guest)
+        [HttpHead("{guestId}")]
+        public async Task<IActionResult> CheckGuestExists(string guestId)
         {
-            _context.Guests.Add(guest);
-            await _context.SaveChangesAsync();
+            if (!int.TryParse(guestId, out _))
+                return BadRequest(new { message = "GuestId must be a valid integer." });
 
-            return CreatedAtAction("GetGuest", new { id = guest.Id }, guest);
-        }
-
-        // DELETE: api/Guests/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGuest(int id)
-        {
-            var guest = await _context.Guests.FindAsync(id);
-            if (guest == null)
-            {
-                return NotFound();
-            }
-
-            _context.Guests.Remove(guest);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool GuestExists(int id)
-        {
-            return _context.Guests.Any(e => e.Id == id);
+            var exists = await _guestService.IsGuestAsync(guestId);
+            return exists ? Ok() : NotFound();
         }
     }
 }

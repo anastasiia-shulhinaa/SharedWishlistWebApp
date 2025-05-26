@@ -1,0 +1,132 @@
+/* WishlistCreateForm.css */
+
+/* Root container for the form */
+.wishlist-create-form {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 2px solid var(--primary-pink);
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Header section */
+.wishlist-create-form__header {
+    background: var(--primary-pink);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+    .wishlist-create-form__header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+    }
+
+    .wishlist-create-form__header i {
+        margin-right: 0.5rem;
+    }
+
+/* Body section */
+.wishlist-create-form__body {
+    padding: 1rem;
+}
+
+/* Error message */
+.wishlist-create-form__error {
+    background: rgba(220, 38, 38, 0.3);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #dc2626;
+    margin-bottom: 1rem;
+}
+
+/* Form fields */
+.wishlist-create-form__field {
+    margin-bottom: 1rem;
+}
+
+.wishlist-create-form__label {
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+    .wishlist-create-form__label span {
+        color: #f87171; /* Matches text-red-400 */
+        margin-left: 0.25rem;
+    }
+
+.wishlist-create-form__input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(45, 212, 191, 0.5); /* --primary-teal with opacity */
+    background: rgba(245, 245, 245, 0.1); /* --soft-white with opacity */
+    color: white;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+    .wishlist-create-form__input::placeholder {
+        color: #d1d5db; /* Matches placeholder-gray-300 */
+    }
+
+    .wishlist-create-form__input:focus {
+        outline: none;
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 5px rgba(45, 212, 191, 0.3);
+    }
+
+/* Date field hint */
+.wishlist-create-form__hint {
+    display: block;
+    margin-top: 0.25rem;
+    color: #e5e7eb; /* Matches text-gray-200 */
+    font-size: 0.875rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Submit button */
+.wishlist-create-form__button {
+    padding: 0.5rem 1.5rem;
+    background: var(--primary-teal);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+    .wishlist-create-form__button:hover {
+        background: var(--primary-pink);
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .wishlist-create-form__button i {
+        margin-right: 0.5rem;
+    }
+
+/* Animation (kept from global CSS) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

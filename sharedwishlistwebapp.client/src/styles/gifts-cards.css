@@ -1,0 +1,175 @@
+/* Container for the gift list */
+.gift-list-container {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 4px solid transparent;
+    border-image: linear-gradient(to right, #f472b6, #2dd4bf) 1;
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in;
+    margin-bottom: 1.5rem;
+}
+
+/* Header */
+.gift-list-header {
+    background: var(--primary-pink);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+    .gift-list-header i {
+        margin-right: 0.5rem;
+    }
+
+/* Body */
+.gift-list-body {
+    padding: 1.5rem;
+}
+
+/* Empty state */
+.gift-list-empty {
+    text-align: center;
+    color: #d1d5db;
+    font-size: 1.125rem;
+}
+
+/* Grid layout for cards */
+.gift-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Individual gift card */
+.gift-card {
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 4px solid transparent;
+    border-image: linear-gradient(to right, #f472b6, #2dd4bf) 1;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+    .gift-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+/* Gift image */
+.gift-card__image {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+    .gift-card__image img {
+        border-radius: 0.5rem;
+    }
+
+/* Gift title */
+.gift-card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+/* Gift description */
+.gift-card__description {
+    margin-bottom: 0.75rem;
+    color: #e5e7eb;
+}
+
+/* Gift price */
+.gift-card__price {
+    margin-bottom: 0.75rem;
+}
+
+/* Gift link */
+.gift-card__link {
+    margin-bottom: 0.75rem;
+}
+
+    .gift-card__link a {
+        color: var(--primary-lemon);
+        text-decoration: none;
+    }
+
+        .gift-card__link a:hover {
+            text-decoration: underline;
+        }
+
+/* Reserved status */
+.gift-card__reserved {
+    margin-bottom: 0.75rem;
+}
+
+/* Reserved amount */
+.gift-card__amount {
+    margin-bottom: 0.75rem;
+}
+
+/* Number of reservations */
+.gift-card__reservations {
+    margin-bottom: 1rem;
+}
+
+/* Reserve button */
+.gift-card__reserve-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-teal);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+    .gift-card__reserve-btn:hover {
+        background: var(--primary-lemon);
+        transform: scale(1.05);
+    }
+
+    .gift-card__reserve-btn:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+    }
+
+    .gift-card__reserve-btn i {
+        margin-right: 0.5rem;
+    }
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseSlow {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+}
